@@ -11,7 +11,7 @@
     "url": "git+https://github.com/nidayand/node-red-contrib-tradfri.git"
   },
   "author": "nidayand",
-  "license": "Apache-2.0",
+  "license": "ISC",
   "bugs": {
     "url": "https://github.com/nidayand/node-red-contrib-tradfri/issues"
   },
