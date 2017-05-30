@@ -1,19 +1,11 @@
-/*jslint node: true */
-module.exports = function (RED) {
-    "use strict";
-    /*
-        Defines the output node for a rule. Copied to a large extent from 66-mongodb.js
-    */
-    function TradfriOutNode(config) {
-        RED.nodes.createNode(this, config);
+module.exports = function(RED) {
+    function LowerCaseNode(config) {
+        RED.nodes.createNode(this,config);
         var node = this;
-
-        /* When a message is received */
-        node.on("input", function (msg) {
-
-            //node.send(nmsg);
+        node.on('input', function(msg) {
+            msg.payload = msg.payload.toLowerCase();
+            node.send(msg);
         });
-
     }
-    RED.nodes.registerType("tradfri-out", TradfriOutNode);
-};
+    RED.nodes.registerType("lower-case",LowerCaseNode);
+}

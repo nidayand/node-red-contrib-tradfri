@@ -1,32 +1,20 @@
-<!-- HTML -->
+<script type="text/javascript">
+    RED.nodes.registerType('tradfri-out', {
+        category: 'output',
+        defaults: {
+            name: {value: "", required: true}
+        },
+        inputs: 1,
+        outputs: 1
+    });
+</script>
 <script type="text/x-red" data-template-name="tradfri-out">
     <div class="form-row">
-        <label for="node-input-code"><i class="fa fa-lightbulb-o"></i> Code</label>
-        <input type="text" id="node-input-code">
-    </div>
-    <div class="form-row">
-        <label>&nbsp;</label>
-        <input type="checkbox" id="node-input-dimmable" placeholder="Only" style="display: inline-block; width: auto; vertical-align: top;">
-        <label for="node-input-dimmable" style="width: 70%;">Dimmable</label>
-    </div>
-    <div class="form-row">
-        <label for="node-input-code"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
     </div>
 </script>
 <script type="text/x-red" data-help-name="tradfri-out">
     <p>/p>
 </script>
-<script type="text/javascript">
-    RED.nodes.registerType('tradfri-out', {
-        category: 'output',
-        defaults: {
-            name: {value: "", required: true},
-            code: {value: "", required: true},
-            dimmable: {value: false, required: true}
-        },
-        inputs: 1,
-        outputs: 1,
-        align: "right"
-    });
-</script>
+
