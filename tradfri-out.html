@@ -2,7 +2,8 @@
     RED.nodes.registerType('tradfri-out', {
         category: 'output',
         defaults: {
-            name: {value: "", required: true}
+            name: {value: "", required: true},
+            config : {type: "tradfri-config", required: true}
         },
         inputs: 1,
         outputs: 1
@@ -13,8 +14,37 @@
         <label for="node-input-name"><i class="icon-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
     </div>
+    <div class="form-row">
+        <label for="node-input-config"><i class="fa fa-bookmark"></i> Config</label>
+        <input type="text" id="node-input-config">
+    </div>
 </script>
 <script type="text/x-red" data-help-name="tradfri-out">
     <p></p>
 </script>
 
+<script type="text/javascript">
+    RED.nodes.registerType('tradfri-config', {
+        category: 'config',
+        color: "rgb(218, 196, 180)",
+        defaults: {
+            name:  {value: ""}
+        },
+        label: function () {
+            return this.name || "IKEA Hub";
+        }
+    });
+</script>
+<script type="text/x-red" data-template-name="tradfri-config">
+    <div class="form-row" style="width:500px">
+        <p></p>
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-delay"><i class="fa fa-clock-o"></i> Rule send delay</label>
+        <input type="text" id="node-config-input-delay" style="direction:rtl; width:50px !important"> seconds
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-config-input-name" placeholder="Name">
+    </div>
+</script>
