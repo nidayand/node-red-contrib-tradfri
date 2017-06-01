@@ -13,7 +13,8 @@ module.exports = function (RED) {
   function TradfriNode(config) {
     RED.nodes.createNode(this, config);
     this.hub = RED.nodes.getNode(config.hub);
-    this.name = config.name
+    this.name = config.name;
+    this.id = config.id;
 
     var node = this;
 
@@ -29,10 +30,19 @@ module.exports = function (RED) {
     }
 
     node.on('input', function (msg) {
-      node.hub.tradfri.getAll().then(res => {
-        msg.payload = res;
-        node.send(msg);
-      });
+      // Check what type
+      switch(typeof msg.payload){
+        case "object":
+          break;
+        case "string":
+          var action = msg.payload.trim().toLowerCase();
+
+          if (node.name.indexOf('(group)') !=-1)
+            node.hub.tradfri.setGroupState(node.id,{state: action}).then().catch( err => {node.error(err)});
+          else
+            node.hub.tradfri.setDeviceState(node.id, {state: action}).then().catch(err => {node.error(err)});
+          break;
+      }
     });
   }
   RED.nodes.registerType("tradfri-out", TradfriNode);
@@ -60,14 +70,23 @@ module.exports = function (RED) {
     });
 
     var d = [];
+    var retError = function(err, res){
+      res.writeHead(200, {
+        'Content-Type': 'application/json'
+      });
+      res.write(JSON.stringify({ status: 'error'}));
+      res.end();
+    }
+
     tradfri.getGroups().then(groups => {
       groups.forEach(group => {
         group.type = 'group';
         d.push(group);
       });
-
       return tradfri.getDevices();
 
+    }).catch(err =>{
+      retError(err, res);
     }).then((devices) => {
       devices.forEach(device => {
         device.type = 'device';
@@ -81,11 +100,8 @@ module.exports = function (RED) {
       res.end();
 
     }).catch(err => {
-      res.writeHead(200, {
-        'Content-Type': 'application/json'
-      });
-      res.write(JSON.stringify({ status: 'error'}));
-      res.end();
+      console.log(22);
+      retError(err, res);
     });
   });
 }

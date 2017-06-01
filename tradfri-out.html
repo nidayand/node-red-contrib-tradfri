@@ -2,21 +2,110 @@
     RED.nodes.registerType('tradfri-out', {
         category: 'output',
         defaults: {
-            name: {value: "", required: true},
-            config : {type: "tradfri-config", required: true}
+            name: {value: ""},
+            id: {value: "0", required:true},
+            hub : {type: "tradfri-config", required: true}
         },
+        color: "#E9967A",
+        icon: "light.png",
+        align: 'right',
         inputs: 1,
-        outputs: 1
+        outputs: 0,
+        label : function(){ return this.name || "tradfri"},
+        oneditsave: function(){
+          $('#node-input-name').val($('#node-input-id option:selected').text());
+        },
+        oneditprepare: function(){
+          //Register help
+          var setHover = function(obj, txt){
+            obj.hover(function(){
+              $('#tradfri-help').html(txt);
+            },function(){
+              $('#tradfri-help').html('');
+            });
+          }
+          setHover($('#tradfri-custom-refresh'),'Click to refresh list of groups and devices from the IKEA hub');
+          setHover($('#node-input-hub'),'Select IKEA hub configuration to use');
+          setHover($('#node-input-id'),'Select the light to control or choose [Select by msg.deviceId] to define the light to control via the inbound message');
+
+          // Show name and id in select box
+          if (parseInt(this.id) !== 0){
+            $('#node-input-id').append($('<option>', {
+                        value: this.id,
+                        text : this.name
+                    }));
+          }
+          $('#node-input-id').val(this.id);
+
+          // Register onchange to clear the list if config is changed
+          $('#node-input-config').on('change',function(){
+            $('#node-input-id').find('option').remove();
+            $('#node-input-id').append('<option value="0">Select by msg.deviceId</option>');
+          });
+
+          // Register onclick to get data
+          $('#tradfri-custom-refresh').click(function(){
+
+            // Get the selected configuration
+            if ($('#node-input-hub option:selected').val() === "_ADD_"){
+              alert("Please select a hub configuration");
+              return;
+            }
+
+            //Start spinner
+            $('#tradfri-spinner').addClass('fa-pulse');
+
+            // Get the config node
+            var c = RED.nodes.node($('#node-input-hub option:selected').val());
+
+            // Try to connect to hub to get device and group data
+            $.get('/tradfri/controls',{sid:c.sid, coap:c.coap, hubip:c.hubip}, function(data){
+
+              // Stop spinner
+              $('#tradfri-spinner').removeClass('fa-pulse');
+
+              if (data.status === "ok"){
+                //Store the currently selected id and name
+                var id = $('#node-input-id option:selected').val();
+                var name = $('#node-input-id option:selected').text();
+
+                // Remove old options
+                $('#node-input-id').find('option').remove();
+                $('#node-input-id').append('<option value="0">Select by msg.deviceId</option>');
+                data.items.forEach(function(item){
+                   $('#node-input-id').append($('<option>', {
+                        value: item.id,
+                        text : item.name + (item.type==='group'? ' (group)':'')
+                    }));
+                });
+                $('#node-input-id').val(id);
+
+              } else {
+                alert('Please verify your hub configuration settings or try again!');
+              }
+            });
+          });
+        }
     });
 </script>
 <script type="text/x-red" data-template-name="tradfri-out">
-    <div class="form-row">
-        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
+    <div class="form-row" style="display:none">
+        <input type="text" id="node-input-name">
     </div>
     <div class="form-row">
         <label for="node-input-config"><i class="fa fa-bookmark"></i> Config</label>
-        <input type="text" id="node-input-config">
+        <input type="text" id="node-input-hub">
+    </div>
+    <div class="form-row">
+        <label for="node-input-id"><i class="icon-tag"></i> Device</label>
+        <select id="node-input-id" style="smargin-right:5px;">
+            <option value="0">Select by msg.deviceId</option>
+        </select>
+
+        <a id="tradfri-custom-refresh" class="editor-button" style=""><i id="tradfri-spinner" class="fa fa-refresh"></i></a>
+    </div>
+    <div class="form-row">
+        <i style="font-size:95%;color:#E9967A"><span id="tradfri-help"></span></i>
     </div>
 </script>
 <script type="text/x-red" data-help-name="tradfri-out">
@@ -26,9 +115,11 @@
 <script type="text/javascript">
     RED.nodes.registerType('tradfri-config', {
         category: 'config',
-        color: "rgb(218, 196, 180)",
         defaults: {
-            name:  {value: ""}
+            name:  {value: ""},
+            hubip : {value: "", required:true},
+            sid: {value:"", required:true},
+            coap: {value:"", required:true}
         },
         label: function () {
             return this.name || "IKEA Hub";
@@ -40,11 +131,19 @@
         <p></p>
     </div>
     <div class="form-row">
-        <label for="node-config-input-delay"><i class="fa fa-clock-o"></i> Rule send delay</label>
-        <input type="text" id="node-config-input-delay" style="direction:rtl; width:50px !important"> seconds
-    </div>
-    <div class="form-row">
         <label for="node-config-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-config-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-hubip"><i class="fa fa-tag"></i> Hub IP address</label>
+        <input type="text" id="node-config-input-hubip" placeholder="Hub IP address">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-sid"><i class="fa fa-tag"></i> Security ID</label>
+        <input type="text" id="node-config-input-sid" placeholder="As found on IKEA hub device">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-coap"><i class="fa fa-tag"></i> CoAP path</label>
+        <input type="text" id="node-config-input-coap" placeholder="CoAP path">
     </div>
 </script>
