@@ -12,21 +12,24 @@ module.exports = function (RED) {
    */
   function TradfriNode(config) {
     RED.nodes.createNode(this, config);
+    this.hub = RED.nodes.getNode(config.hub);
+    this.name = config.name
+
     var node = this;
 
     // Configure the tradfri class as a global
-    if (!RED.settings.functionGlobalContext.tradfri) {
-      RED.settings.functionGlobalContext.tradfri = require('node-tradfri-argon').create({
-        securityId: "2wsY1QSL65k3iD8i",
-        hubIpAddress: "192.168.2.213",
-        coapClientPath: "/home/user/libcoap/examples/coap-client"
+    if (node.hub.tradfri == null) {
+      node.hub.tradfri = require('node-tradfri-argon').create({
+        securityId: node.hub.sid,
+        hubIpAddress: node.hub.hubip,
+        coapClientPath: node.hub.coap
       });
-    }
-    var tradfri = RED.settings.functionGlobalContext.tradfri;
+      console.log("configured");
 
+    }
 
     node.on('input', function (msg) {
-      tradfri.getAll().then(res => {
+      node.hub.tradfri.getAll().then(res => {
         msg.payload = res;
         node.send(msg);
       });
@@ -36,9 +39,53 @@ module.exports = function (RED) {
 
   function TradfriConfigNode(config) {
     RED.nodes.createNode(this, config);
-    var node = this;
+    this.name = config.name;
+    this.hubip = config.hubip;
+    this.sid = config.sid;
+    this.coap = config.coap;
+    this.tradfri = null; // Declare object to hold Tradfri class
 
   }
   RED.nodes.registerType("tradfri-config", TradfriConfigNode);
 
+
+  RED.httpAdmin.get('/tradfri/controls', function (req, res) {
+    /* Expecting to get the following params
+      sid, hubip, coap
+    */
+    var tradfri = require('node-tradfri-argon').create({
+      securityId: req.query.sid,
+      hubIpAddress: req.query.hubip,
+      coapClientPath: req.query.coap
+    });
+
+    var d = [];
+    tradfri.getGroups().then(groups => {
+      groups.forEach(group => {
+        group.type = 'group';
+        d.push(group);
+      });
+
+      return tradfri.getDevices();
+
+    }).then((devices) => {
+      devices.forEach(device => {
+        device.type = 'device';
+        d.push(device);
+      });
+      // Return array
+      res.writeHead(200, {
+        'Content-Type': 'application/json'
+      });
+      res.write(JSON.stringify({ items: d, status: 'ok'}));
+      res.end();
+
+    }).catch(err => {
+      res.writeHead(200, {
+        'Content-Type': 'application/json'
+      });
+      res.write(JSON.stringify({ status: 'error'}));
+      res.end();
+    });
+  });
 }
