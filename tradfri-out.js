@@ -1,6 +1,5 @@
 module.exports = function (RED) {
   'use strict';
-  var rsvp = require('rsvp');
 
   function TradfriUtilNode(config) {
     RED.nodes.createNode(this, config);

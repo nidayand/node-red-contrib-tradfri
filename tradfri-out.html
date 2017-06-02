@@ -52,7 +52,7 @@
     <li><code>CoAP path</code> - The file system path to the CoAP library that talked to the IKEA hub.</li>
     </ul>
     Look at <a href="https://github.com/nidayand/node-tradfri-argon" target=_blank>node-tradfri-argon</a> on instructions on how to compile the libcoap library. The executible will be in the [examples] directory when it has finished the compilation. E.g. <code>/home/pi/libcoap/examples/coap-client</code>
-  </p>
+    </p>
 </script>
 
 
@@ -174,7 +174,24 @@
     </div>
 </script>
 <script type="text/x-red" data-help-name="tradfri-out">
-    <p></p>
+    <p>Set state (on/off/brightness) on an IKEA TRÅDFRI device or group</p>
+    <h3>Inputs</h3>
+      <dl class="message-properties">
+          <dt>payload
+              <span class="property-type">object | string</span>
+          </dt>
+          <dd>either a string with <code>on</code> or <code>off</code> or an object <code>{ id: 12321, type: "group", instruction: { state: "on", brightness: 255}}</code> where <code>id</code>, <code>type</code> and <code>brightness</code> are optional parameters (depending on the node configuration)</dd>
+      </dl>
+    <h3>Details</h3>
+    <p>If <code>msg.payload</code> is a a string (on/off) a device or group must have been defined in the node. If <code>msg.payload</code> is an object any information will override defined attributes in the node.</p>
+    <p>The <code>Config</code> setting requests a number of parameters:
+    <ul>
+    <li><code>Security Code</code> - As found on the IKEA hub. See picture below</li>
+    <li><code>IP address</code> - The IP address of the IKEA hub.</li>
+    <li><code>CoAP path</code> - The file system path to the CoAP library that talked to the IKEA hub.</li>
+    </ul>
+    Look at <a href="https://github.com/nidayand/node-tradfri-argon" target=_blank>node-tradfri-argon</a> on instructions on how to compile the libcoap library. The executible will be in the [examples] directory when it has finished the compilation. E.g. <code>/home/pi/libcoap/examples/coap-client</code>
+    </p>
 </script>
 
 <script type="text/javascript">
