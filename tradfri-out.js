@@ -14,6 +14,7 @@ module.exports = function (RED) {
     RED.nodes.createNode(this, config);
     this.hub = RED.nodes.getNode(config.hub);
     this.name = config.name;
+    this.dtype = config.dtype;
     this.id = config.id;
 
     var node = this;
@@ -33,11 +34,30 @@ module.exports = function (RED) {
       // Check what type
       switch(typeof msg.payload){
         case "object":
+          var id = msg.payload.id ? msg.payload.id : node.id;
+          var type = msg.payload.type ? msg.payload.type : node.type;
+          if (id === 0){
+            node.error("msg.payload.id, device or group has not been defined");
+            return;
+          }
+          if (!(type == "group") && !(type =="device")){
+            node.error("msg.payload.type, device or group has not been defined");
+            return;
+          }
+          if (!msg.payload.instruction){
+            node.error("msg.payload.instruction object has not been defined");
+            return;
+          }
+          if (type === "group"){
+            node.hub.tradfri.setGroupState(id, msg.payload.instruction).then().catch( err => {node.error(err)});
+          } else {
+            node.hub.tradfri.setDeviceState(id, msg.payload.instruction).then().catch(err => {node.error(err)});
+          }
           break;
         case "string":
           var action = msg.payload.trim().toLowerCase();
 
-          if (node.name.indexOf('(group)') !=-1)
+          if (node.dtype === "group")
             node.hub.tradfri.setGroupState(node.id,{state: action}).then().catch( err => {node.error(err)});
           else
             node.hub.tradfri.setDeviceState(node.id, {state: action}).then().catch(err => {node.error(err)});
