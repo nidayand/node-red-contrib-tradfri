@@ -1,4 +1,36 @@
 <script type="text/javascript">
+    RED.nodes.registerType('tradfri-util', {
+        category: 'function',
+        defaults: {
+            name: {value: ""},
+            hub : {type: "tradfri-config", required: true}
+        },
+        color: "#E9967A",
+        icon: "light.png",
+        align: 'left',
+        inputs: 1,
+        outputs: 1,
+        label : function(){ return this.name || "tradfri"}
+    });
+</script>
+<script type="text/x-red" data-template-name="tradfri-util">
+    <div class="form-row" style="display:none">
+        <input type="text" id="node-input-name"><input type="text" id="node-input-dtype">
+    </div>
+    <div class="form-row">
+        <label for="node-input-config"><i class="fa fa-bookmark"></i> Config</label>
+        <input type="text" id="node-input-hub">
+    </div>
+    <div class="form-row">
+        <i style="font-size:95%;color:#E9967A"><span id="tradfri-help"></span></i>
+    </div>
+</script>
+<script type="text/x-red" data-help-name="tradfri-util">
+    <p></p>
+</script>
+
+
+<script type="text/javascript">
     RED.nodes.registerType('tradfri-out', {
         category: 'output',
         defaults: {

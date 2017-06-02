@@ -2,6 +2,31 @@ module.exports = function (RED) {
   'use strict';
   var rsvp = require('rsvp');
 
+  function TradfriUtilNode(config) {
+    RED.nodes.createNode(this, config);
+    this.hub = RED.nodes.getNode(config.hub);
+    this.name = config.name;
+
+    var node = this;
+
+    // Configure the tradfri class as a global
+    if (node.hub.tradfri == null) {
+      node.hub.tradfri = require('node-tradfri-argon').create({
+        securityId: node.hub.sid,
+        hubIpAddress: node.hub.hubip,
+        coapClientPath: node.hub.coap
+      });
+      console.log("configured");
+
+    }
+
+    node.on('input', function (msg) {
+
+    });
+  }
+  RED.nodes.registerType("tradfri-get", TradfriUtilNode);
+
+
   /**
    * Server side definition of tradfri node. Multiple options
    * - either is the device or group configured in the node
