@@ -1,7 +1,7 @@
 {
   "name": "node-red-contrib-tradfri",
   "version": "0.0.1",
-  "description": "Node-RED node for IKEA TRÅDFRI devices",
+  "description": "Node-RED nodes to read and control IKEA TRÅDFRI lights",
   "keywords": [
     "ikea",
     "tradfri"
@@ -15,6 +15,7 @@
   },
   "author": "nidayand",
   "license": "ISC",
+  "keywords": [ "node-red" ],
   "bugs": {
     "url": "https://github.com/nidayand/node-red-contrib-tradfri/issues"
   },
