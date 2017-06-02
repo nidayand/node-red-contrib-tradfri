@@ -1,9 +1,14 @@
 {
   "name": "node-red-contrib-tradfri",
   "version": "1.0.0",
-  "description": "Node-RED nodes to read and control IKEA TRÅDFRI lights",
+  "description": "Node-RED nodes to read and control IKEA TRÅDFRI (TRADFRI) lights",
   "keywords": [
-    "node-red"
+    "node-red",
+    "ikea",
+    "trådfri",
+    "tradfri",
+    "lights",
+    "automation"
   ],
   "engines": {
     "node": ">=4.4.7"
