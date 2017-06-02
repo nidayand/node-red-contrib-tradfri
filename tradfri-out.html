@@ -1,5 +1,5 @@
 <script type="text/javascript">
-    RED.nodes.registerType('tradfri-util', {
+    RED.nodes.registerType('tradfri-get', {
         category: 'function',
         defaults: {
             name: {value: ""},
@@ -10,10 +10,10 @@
         align: 'left',
         inputs: 1,
         outputs: 1,
-        label : function(){ return this.name || "tradfri"}
+        label : function(){ return this.name || "tradfri get"}
     });
 </script>
-<script type="text/x-red" data-template-name="tradfri-util">
+<script type="text/x-red" data-template-name="tradfri-get">
     <div class="form-row" style="display:none">
         <input type="text" id="node-input-name"><input type="text" id="node-input-dtype">
     </div>
@@ -25,8 +25,34 @@
         <i style="font-size:95%;color:#E9967A"><span id="tradfri-help"></span></i>
     </div>
 </script>
-<script type="text/x-red" data-help-name="tradfri-util">
-    <p></p>
+<script type="text/x-red" data-help-name="tradfri-get">
+    <p>Retrieves IKEA TRÅDFRI device information from your IKEA hub.</p>
+    <h3>Inputs</h3>
+      <dl class="message-properties">
+          <dt>payload
+              <span class="property-type">string | integer | optional</span>
+          </dt>
+          <dd> the device or group id to lookup</dd>
+      </dl>
+    <h3>Outputs</h3>
+         <ol class="node-ports">
+             <li>Standard output
+                 <dl class="message-properties">
+                     <dt>payload <span class="property-type">object | array</span></dt>
+                     <dd>Device, group object or an array with all groups and devices</dd>
+                 </dl>
+             </li>
+         </ol>
+    <h3>Details</h3>
+    <p>If <code>msg.payload</code> is a number the details of that device or group will be retrieved and returned in msg.payload as an object. If <code>msg.payload</code> is not set or is not a number the complete structure will be retrieved from the defined IKEA Hub.</p>
+    <p>The <code>Config</code> setting requests a number of parameters:
+    <ul>
+    <li><code>Security Code</code> - As found on the IKEA hub. See picture below</li>
+    <li><code>IP address</code> - The IP address of the IKEA hub.</li>
+    <li><code>CoAP path</code> - The file system path to the CoAP library that talked to the IKEA hub.</li>
+    </ul>
+    Look at <a href="https://github.com/nidayand/node-tradfri-argon" target=_blank>node-tradfri-argon</a> on instructions on how to compile the libcoap library. The executible will be in the [examples] directory when it has finished the compilation. E.g. <code>/home/pi/libcoap/examples/coap-client</code>
+  </p>
 </script>
 
 
@@ -178,7 +204,7 @@
         <input type="text" id="node-config-input-hubip" placeholder="Hub IP address">
     </div>
     <div class="form-row">
-        <label for="node-config-input-sid"><i class="fa fa-tag"></i> Security ID</label>
+        <label for="node-config-input-sid"><i class="fa fa-tag"></i> Security Code</label>
         <input type="text" id="node-config-input-sid" placeholder="As found on IKEA hub device">
     </div>
     <div class="form-row">

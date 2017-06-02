@@ -21,7 +21,27 @@ module.exports = function (RED) {
     }
 
     node.on('input', function (msg) {
-
+      if (msg.payload && !isNaN(parseInt(msg.payload))){
+        node.hub.tradfri.getDevice(msg.payload).then(device => {
+          msg.payload = device;
+          node.send(msg);
+        }).catch( err => {
+          node.hub.tradfri.getGroup(msg.payload).then(group => {
+            msg.payload = group;
+            node.send(msg);
+          }).catch( err => {
+            node.error("Could not find device or group with the specified id or the IKEA Hub did not respond");
+            return null;
+          });
+        });
+      } else {
+        node.hub.tradfri.getAll().then(all => {
+          msg.payload = all;
+          node.send(msg);
+        }).catch(err => {
+          node.error("IKEA Hub did not respond. Review the configuration or try again");
+        });
+      }
     });
   }
   RED.nodes.registerType("tradfri-get", TradfriUtilNode);
