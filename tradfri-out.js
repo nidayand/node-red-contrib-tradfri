@@ -60,6 +60,7 @@ module.exports = function (RED) {
     this.name = config.name;
     this.dtype = config.dtype;
     this.id = config.id;
+    this.output = config.output;
 
     var node = this;
 
@@ -70,8 +71,6 @@ module.exports = function (RED) {
         hubIpAddress: node.hub.hubip,
         coapClientPath: node.hub.coap
       });
-      console.log("configured");
-
     }
 
     node.on('input', function (msg) {
@@ -93,18 +92,18 @@ module.exports = function (RED) {
             return;
           }
           if (type === "group"){
-            node.hub.tradfri.setGroupState(id, msg.payload.instruction).then().catch( err => {node.error(err)});
+            node.hub.tradfri.setGroupState(id, msg.payload.instruction).then(() => {msg.payload=true; if (node.output) node.send(msg);}).catch( err => {node.error(err); msg.payload=false; if (node.output) node.send(msg);});
           } else {
-            node.hub.tradfri.setDeviceState(id, msg.payload.instruction).then().catch(err => {node.error(err)});
+            node.hub.tradfri.setDeviceState(id, msg.payload.instruction).then(() => {msg.payload=true; if (node.output) node.send(msg);}).catch(err => {node.error(err); msg.payload=false; if (node.output) node.send(msg);});
           }
           break;
         case "string":
           var action = msg.payload.trim().toLowerCase();
 
           if (node.dtype === "group")
-            node.hub.tradfri.setGroupState(node.id,{state: action}).then().catch( err => {node.error(err)});
+            node.hub.tradfri.setGroupState(node.id,{state: action}).then(() => {msg.payload=true; if (node.output) node.send(msg);}).catch( err => {node.error(err); msg.payload=false; if (node.output) node.send(msg);});
           else
-            node.hub.tradfri.setDeviceState(node.id, {state: action}).then().catch(err => {node.error(err)});
+            node.hub.tradfri.setDeviceState(node.id, {state: action}).then(() => {msg.payload=true; if (node.output) node.send(msg);}).catch(err => {node.error(err); msg.payload=false; if (node.output) node.send(msg);});
           break;
       }
     });

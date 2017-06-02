@@ -68,7 +68,8 @@
             name: {value: ""},
             dtype: {value: "device"},
             id: {value: "0", required:true},
-            hub : {type: "tradfri-config", required: true}
+            hub : {type: "tradfri-config", required: true},
+            output: {value: false, required:true }
         },
         color: "#E9967A",
         icon: "light.png",
@@ -79,6 +80,12 @@
         oneditsave: function(){
           $('#node-input-name').val($('#node-input-id option:selected').text());
           $('#node-input-dtype').val($('#node-input-id option:selected').attr('dtype'));
+          var node=this;
+          if ($("#node-input-output").is(":checked")){
+              node.outputs=1;
+          } else {
+              node.outputs=0;
+          }
         },
         oneditprepare: function(){
           //Register help
@@ -167,6 +174,11 @@
         <input type="text" id="node-input-hub">
     </div>
     <div class="form-row">
+        <label>&nbsp;</label>
+        <input type="checkbox" id="node-input-output" placeholder="Only" style="display: inline-block; width: auto; vertical-align: top;">
+        <label for="node-input-output" style="width: 70%;">Use output</label>
+    </div>
+    <div class="form-row">
         <label for="node-input-id"><i class="icon-tag"></i> Device</label>
         <select id="node-input-id" style="smargin-right:5px;">
             <option value="0">By msg.id</option>
@@ -187,6 +199,15 @@
           </dt>
           <dd>either a string with <code>on</code> or <code>off</code> or an object <code>{ id: 12321, type: "group", instruction: { state: "on", brightness: 255}}</code> where <code>id</code>, <code>type</code> and <code>brightness</code> are optional parameters (depending on the node configuration)</dd>
       </dl>
+     <h3>Outputs</h3>
+         <ol class="node-ports">
+             <li>Standard output
+                 <dl class="message-properties">
+                     <dt>payload <span class="property-type">boolean | optional</span></dt>
+                     <dd>if output is enabled success or failure is described by true or false</dd>
+                 </dl>
+             </li>
+         </ol>
     <h3>Details</h3>
     <p>If <code>msg.payload</code> is a a string (on/off) a device or group must have been defined in the node. If <code>msg.payload</code> is an object any information will override defined attributes in the node.</p>
     <p>The <code>Config</code> setting requires a number of parameters:
