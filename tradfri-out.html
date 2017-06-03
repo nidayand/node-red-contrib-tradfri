@@ -10,7 +10,17 @@
         align: 'left',
         inputs: 1,
         outputs: 1,
-        label : function(){ return this.name || "tradfri get"}
+        label : function(){ return this.name || "tradfri get"},
+        oneditprepare : function(){
+          var setHover = function(obj, txt){
+            obj.hover(function(){
+              $('#tradfri-help').html(txt);
+            },function(){
+              $('#tradfri-help').html('');
+            });
+          }
+          setHover($('#node-input-hub'),'Select IKEA hub configuration to use');
+        }
     });
 </script>
 <script type="text/x-red" data-template-name="tradfri-get">
@@ -99,6 +109,7 @@
           setHover($('#tradfri-custom-refresh'),'Click to refresh list of groups and devices from the IKEA hub');
           setHover($('#node-input-hub'),'Select IKEA hub configuration to use');
           setHover($('#node-input-id'),'Select the light to control or choose [By msg.id] to define the light to control via the inbound message');
+          setHover($('#node-input-output'),'Enable output to get the result from the request in msg.payload in boolean');
 
           // Show name and id in select box
           if (parseInt(this.id) !== 0){
