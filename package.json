@@ -36,8 +36,7 @@
   "keywords": [ "node-red" ],
   "node-red": {
     "nodes": {
-      "tradfri-out": "tradfri-out.js",
-      "tradfri-get": "tradfri-out.js"
+      "tradfri-out": "tradfri-out.js"
     }
   }
 }
