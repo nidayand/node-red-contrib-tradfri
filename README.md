@@ -8,7 +8,7 @@ Two, really easy to use, nodes that will help you to:
 
 ![IKEA TRÅDFRI devices](https://cloud.githubusercontent.com/assets/2181965/26756721/7c3cddac-48a9-11e7-83fb-701d3c111e4b.jpg)
 
-##Documentation
+## Documentation
 
 ### tradfri-out node
 Set state (on/off/brightness) on an IKEA TRÅDFRI device or group
