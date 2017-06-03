@@ -1,5 +1,5 @@
 # node-red-contrib-tradfri
-Node-RED nodes to communicate with IKEA TRÅDFRI lights.
+Node-RED nodes to communicate with IKEA TRÅDFRI lights. [![npm version](https://badge.fury.io/js/node-red-contrib-tradfri.svg)](https://badge.fury.io/js/node-red-contrib-tradfri)
 
 Two, really easy to use, nodes that will help you to:
  - Get information on all devices and or groups
