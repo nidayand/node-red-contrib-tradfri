@@ -33,9 +33,11 @@
     "eslint-plugin-jsx-a11y": "4.0.0",
     "eslint-plugin-react": "6.10.3"
   },
+  "keywords": [ "node-red" ],
   "node-red": {
     "nodes": {
-      "tradfri-out": "tradfri-out.js"
+      "tradfri-out": "tradfri-out.js",
+      "tradfri-get": "tradfri-out.js"
     }
   }
 }
