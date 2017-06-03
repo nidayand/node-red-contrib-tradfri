@@ -242,6 +242,18 @@
         },
         label: function () {
             return this.name || "IKEA Hub";
+        },
+        oneditprepare : function(){
+          var setHover = function(obj, txt){
+            obj.hover(function(){
+              $('#tradfri-help').html(txt);
+            },function(){
+              $('#tradfri-help').html('');
+            });
+          }
+          setHover($('#node-config-input-hubip'),'The IP address of the IKEA TRÅDFRI hub');
+          setHover($('#node-config-input-sid'),'The Security code as found on a sticker under the IKEA TRÅDFRI hub');
+          setHover($('#node-config-input-coap'),'A C program, libcoap, is used to talk to the IKEA TRÅDFRI hub and the path to program should be specified here. In the node-tradfri-argon node module are compilations included that could be used here (in the lib folder e.g. named coap-client-raspbian). If not visit <a href="https://github.com/nidayand/node-tradfri-argon" target=_blank>node-tradfri-argon</a> Github repo to get instructions on how to compile the library (for OSX and Linux)');
         }
     });
 </script>
@@ -264,5 +276,8 @@
     <div class="form-row">
         <label for="node-config-input-coap"><i class="fa fa-tag"></i> CoAP path</label>
         <input type="text" id="node-config-input-coap" placeholder="CoAP path">
+    </div>
+    <div class="form-row">
+        <i style="font-size:95%;color:#E9967A"><span id="tradfri-help"></span></i>
     </div>
 </script>
