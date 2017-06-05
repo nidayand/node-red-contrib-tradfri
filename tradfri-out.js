@@ -167,4 +167,23 @@ module.exports = function (RED) {
       retError(err, res);
     });
   });
+
+  RED.httpAdmin.get('/tradfri/libs', function (req, res) {
+    //Get path to module
+    var pathIndex = require.resolve("node-tradfri-argon");
+    var path = require('path').dirname(pathIndex)+"/lib";
+    var fs = require('fs');
+    var r = [];
+    fs.readdirSync(path).forEach(file => {
+      if (file.indexOf('coap-client-')!=-1){
+        r.push({file:file, path:(path+'/'+file)});
+      }
+    })
+    // Return array
+    res.writeHead(200, {
+      'Content-Type': 'application/json'
+    });
+    res.write(JSON.stringify(r));
+    res.end();
+  });
 }
