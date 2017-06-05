@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-tradfri",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Node-RED nodes to read and control IKEA TRÅDFRI (TRADFRI) lights",
   "keywords": [
     "node-red"
