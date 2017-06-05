@@ -19,7 +19,7 @@ Set state (on/off/brightness) on an IKEA TRÅDFRI device or group
 
 <dt>payload <span class="property-type">object | string</span></dt>
 
-<dd>either a string with `on` or `off` or an object `{ id: 12321, type: "group", instruction: { state: "on", brightness: 255}}` where `id`, `type` and `brightness` are optional parameters (depending on the node configuration)</dd>
+<dd>either a string with `on` or `off` or an object `{ tradfri_id: 12321, type: "group", instruction: { state: "on", brightness: 255}}` where `tradfri_id`, `type` ('device' or 'group') and `brightness` are optional parameters (depending on the node configuration)</dd>
 
 </dl>
 
@@ -87,4 +87,4 @@ Look at [node-tradfri-argon](https://github.com/nidayand/node-tradfri-argon) on 
 #### Examples
 
 *   `msg.payload` = "on", node property `Device` = "Windows" => Turn on "Windows"
-*   `msg.payload` = { id: 15321, type: 'device', instruction: {state:on, brightness:255}} => Turn on device 15321 with brightness max
+*   `msg.payload` = { tradfri_id: 15321, type: 'device', instruction: {state:on, brightness:255}} => Turn on device 15321 with brightness max
