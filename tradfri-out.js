@@ -59,7 +59,7 @@ module.exports = function (RED) {
     this.hub = RED.nodes.getNode(config.hub);
     this.name = config.name;
     this.dtype = config.dtype;
-    this.id = config.id;
+    this.tradfri_id = config.tradfri_id;
     this.output = config.output;
 
     var node = this;
@@ -77,9 +77,9 @@ module.exports = function (RED) {
       // Check what type
       switch(typeof msg.payload){
         case "object":
-          var id = msg.payload.id ? msg.payload.id : node.id;
+          var tradfri_id = msg.payload.tradfri_id ? msg.payload.tradfri_id : node.tradfri_id;
           var type = msg.payload.type ? msg.payload.type : node.type;
-          if (id === 0){
+          if (tradfri_id === 0){
             node.error("msg.payload.id, device or group has not been defined");
             return;
           }
@@ -92,18 +92,18 @@ module.exports = function (RED) {
             return;
           }
           if (type === "group"){
-            node.hub.tradfri.setGroupState(id, msg.payload.instruction).then(() => {msg.payload=true; if (node.output) node.send(msg);}).catch( err => {node.error(err); msg.payload=false; if (node.output) node.send(msg);});
+            node.hub.tradfri.setGroupState(tradfri_id, msg.payload.instruction).then(() => {msg.payload=true; if (node.output) node.send(msg);}).catch( err => {node.error(err); msg.payload=false; if (node.output) node.send(msg);});
           } else {
-            node.hub.tradfri.setDeviceState(id, msg.payload.instruction).then(() => {msg.payload=true; if (node.output) node.send(msg);}).catch(err => {node.error(err); msg.payload=false; if (node.output) node.send(msg);});
+            node.hub.tradfri.setDeviceState(tradfri_id, msg.payload.instruction).then(() => {msg.payload=true; if (node.output) node.send(msg);}).catch(err => {node.error(err); msg.payload=false; if (node.output) node.send(msg);});
           }
           break;
         case "string":
           var action = msg.payload.trim().toLowerCase();
 
           if (node.dtype === "group")
-            node.hub.tradfri.setGroupState(node.id,{state: action}).then(() => {msg.payload=true; if (node.output) node.send(msg);}).catch( err => {node.error(err); msg.payload=false; if (node.output) node.send(msg);});
+            node.hub.tradfri.setGroupState(node.tradfri_id,{state: action}).then(() => {msg.payload=true; if (node.output) node.send(msg);}).catch( err => {node.error(err); msg.payload=false; if (node.output) node.send(msg);});
           else
-            node.hub.tradfri.setDeviceState(node.id, {state: action}).then(() => {msg.payload=true; if (node.output) node.send(msg);}).catch(err => {node.error(err); msg.payload=false; if (node.output) node.send(msg);});
+            node.hub.tradfri.setDeviceState(node.tradfri_id, {state: action}).then(() => {msg.payload=true; if (node.output) node.send(msg);}).catch(err => {node.error(err); msg.payload=false; if (node.output) node.send(msg);});
           break;
       }
     });

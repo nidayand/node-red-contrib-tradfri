@@ -66,7 +66,7 @@
     <h3>Examples</h3>
     <ul>
       <li><code>msg.payload</code> = "on", node property <code>Device</code> = "Windows" => Turn on "Windows"</li>
-      <li><code>msg.payload</code> = { id: 15321, type: 'device', instruction: {state:on, brightness:255}} => Turn on device 15321 with brightness max</li>
+      <li><code>msg.payload</code> = { tradfri_id: 15321, type: 'device', instruction: {state:on, brightness:255}} => Turn on device 15321 with brightness max</li>
     </ul>
 </script>
 
@@ -77,7 +77,7 @@
         defaults: {
             name: {value: ""},
             dtype: {value: "device"},
-            id: {value: "0", required:true},
+            tradfri_id: {value: "0", required:true},
             hub : {type: "tradfri-config", required: true},
             output: {value: false, required:true }
         },
@@ -88,8 +88,8 @@
         outputs: 0,
         label : function(){ return this.name || "tradfri"},
         oneditsave: function(){
-          $('#node-input-name').val($('#node-input-id option:selected').text());
-          $('#node-input-dtype').val($('#node-input-id option:selected').attr('dtype'));
+          $('#node-input-name').val($('#node-input-tradfri_id option:selected').text());
+          $('#node-input-dtype').val($('#node-input-tradfri_id option:selected').attr('dtype'));
           var node=this;
           if ($("#node-input-output").is(":checked")){
               node.outputs=1;
@@ -108,23 +108,24 @@
           }
           setHover($('#tradfri-custom-refresh'),'Click to refresh list of groups and devices from the IKEA hub');
           setHover($('#node-input-hub'),'Select IKEA hub configuration to use');
-          setHover($('#node-input-id'),'Select the light to control or choose [By msg.id] to define the light to control via the inbound message');
+          setHover($('#node-input-tradfri_id'),'Select the light to control or choose [By msg.tradfri_id] to define the light to control via the inbound message');
           setHover($('#node-input-output'),'Enable output to get the result from the request in msg.payload in boolean');
 
           // Show name and id in select box
-          if (parseInt(this.id) !== 0){
-            $('#node-input-id').append($('<option>', {
+          if (parseInt(this.tradfri_id) !== 0){
+            $('#node-input-tradfri_id').append($('<option>', {
                         value: this.id,
                         text : this.name,
                         dtype : this.dtype
                     }));
           }
-          $('#node-input-id').val(this.id);
+          //Select the saved value
+          $('#node-input-tradfri_id select').val(this.tradfri_id);
 
           // Register onchange to clear the list if config is changed
           $('#node-input-config').on('change',function(){
-            $('#node-input-id').find('option').remove();
-            $('#node-input-id').append('<option value="0">By msg.id</option>');
+            $('#node-input-tradfri_id').find('option').remove();
+            $('#node-input-tradfri_id').append('<option value="0">By msg.tradfri_id</option>');
           });
 
           // Register onclick to get data
@@ -150,23 +151,23 @@
 
               if (data.status === "ok"){
                 //Store the currently selected id and name
-                var id = $('#node-input-id option:selected').val();
-                var name = $('#node-input-id option:selected').text();
+                var tradfri_id = $('#node-input-tradfri_id option:selected').val();
+                var name = $('#node-input-tradfri_id option:selected').text();
 
                 // Remove old options
-                $('#node-input-id').find('option').remove();
-                $('#node-input-id').append('<option value="0">By msg.id</option>');
+                $('#node-input-tradfri_id').find('option').remove();
+                $('#node-input-tradfri_id').append('<option value="0">By msg.tradfri_id</option>');
                 data.items.forEach(function(item){
-                   $('#node-input-id').append($('<option>', {
+                   $('#node-input-tradfri_id').append($('<option>', {
                         value: item.id,
                         text : item.name + (item.type==='group'? ' (group)':''),
                         dtype: item.type
                     }));
                 });
-                $('#node-input-id').val(id);
+                $('#node-input-tradfri_id').val(tradfri_id);
 
                 //Indicate update
-                $("#node-input-id").fadeIn(100).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100)
+                $("#node-input-tradfri_id").fadeIn(100).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100);
 
               } else {
                 alert('Please verify your hub configuration settings or try again!');
@@ -190,9 +191,9 @@
         <label for="node-input-output" style="width: 70%;">Use output</label>
     </div>
     <div class="form-row">
-        <label for="node-input-id"><i class="icon-tag"></i> Device</label>
-        <select id="node-input-id" style="smargin-right:5px;">
-            <option value="0">By msg.id</option>
+        <label for="node-input-tradfri_id"><i class="icon-tag"></i> Device</label>
+        <select id="node-input-tradfri_id" style="smargin-right:5px;">
+            <option value="0">By msg.tradfri_id</option>
         </select>
 
         <a id="tradfri-custom-refresh" class="editor-button" style=""><i id="tradfri-spinner" class="fa fa-refresh"></i></a>
@@ -208,7 +209,7 @@
           <dt>payload
               <span class="property-type">object | string</span>
           </dt>
-          <dd>either a string with <code>on</code> or <code>off</code> or an object <code>{ id: 12321, type: "group", instruction: { state: "on", brightness: 255}}</code> where <code>id</code>, <code>type</code> and <code>brightness</code> are optional parameters (depending on the node configuration)</dd>
+          <dd>either a string with <code>on</code> or <code>off</code> or an object <code>{ tradfri_id: 12321, type: "group", instruction: { state: "on", brightness: 255}}</code> where <code>tradfri_id</code>, <code>type</code> (device or group) and <code>brightness</code> (0-255) are optional parameters (depending on the node configuration)</dd>
       </dl>
      <h3>Outputs</h3>
          <ol class="node-ports">
