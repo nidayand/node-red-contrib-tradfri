@@ -1,5 +1,6 @@
 module.exports = function (RED) {
   'use strict';
+  var RSVP = require('rsvp');
 
   function TradfriUtilNode(config) {
     RED.nodes.createNode(this, config);
@@ -15,12 +16,10 @@ module.exports = function (RED) {
         hubIpAddress: node.hub.hubip,
         coapClientPath: node.hub.coap
       });
-      console.log("configured");
-
     }
 
     node.on('input', function (msg) {
-      if (msg.payload && !isNaN(parseInt(msg.payload))){
+      if (msg.payload && !isNaN(parseInt(msg.payload))) {
         node.hub.tradfri.getDevice(msg.payload).then(device => {
           msg.payload = device;
           node.send(msg);
@@ -77,28 +76,63 @@ module.exports = function (RED) {
       // Check what type
       switch(typeof msg.payload){
         case "object":
-          var tradfri_id = msg.payload.tradfri_id ? msg.payload.tradfri_id : node.tradfri_id;
-          var type = msg.payload.type ? msg.payload.type : node.type;
-          if (tradfri_id === 0){
-            node.error("msg.payload.id, device or group has not been defined");
+          var tradfri_id = parseInt(node.tradfri_id) != 0 ? node.tradfri_id : msg.payload.tradfri_id;
+          var type = parseInt(node.tradfri_id) != 0 ? node.dtype :  msg.payload.type;
+
+          if (tradfri_id == undefined || type == undefined){
+            node.error("Set your node properties or make sure that tradfri_id and type is passed in the message payload");
             return;
           }
-          if (!(type == "group") && !(type =="device")){
-            node.error("msg.payload.type, device or group has not been defined");
-            return;
-          }
-          if (!msg.payload.instruction){
-            node.error("msg.payload.instruction object has not been defined");
-            return;
-          }
-          if (type === "group"){
-            node.hub.tradfri.setGroupState(tradfri_id, msg.payload.instruction).then(() => {msg.payload=true; if (node.output) node.send(msg);}).catch( err => {node.error(err); msg.payload=false; if (node.output) node.send(msg);});
+
+          if (msg.payload.instruction){
+            // DEPRECATED v1.0.5 Will remote instruction object in v1.1.0
+            // TODO: Remove in v1.1.0
+            // Too complicated structure
+            if (type === "group"){
+              node.hub.tradfri.setGroupState(tradfri_id, msg.payload.instruction).then(() => {msg.payload=true; if (node.output) node.send(msg);}).catch( err => {node.error(err); msg.payload=false; if (node.output) node.send(msg);});
+            } else {
+              node.hub.tradfri.setDeviceState(tradfri_id, msg.payload.instruction).then(() => {msg.payload=true; if (node.output) node.send(msg);}).catch(err => {node.error(err); msg.payload=false; if (node.output) node.send(msg);});
+            }
           } else {
-            node.hub.tradfri.setDeviceState(tradfri_id, msg.payload.instruction).then(() => {msg.payload=true; if (node.output) node.send(msg);}).catch(err => {node.error(err); msg.payload=false; if (node.output) node.send(msg);});
+            // Create object
+            var cinstruction = {};
+
+            cinstruction.state = msg.payload.state ? msg.payload.state: undefined;
+            cinstruction.brightness = msg.payload.brightness ? msg.payload.brightness : undefined;
+            cinstruction.color = msg.payload.color ? msg.payload.color : undefined;
+            cinstruction.transitionTime = msg.payload.transitiontime ? msg.payload.transitiontime*10 : undefined; //Convert to expected lib input (*10)
+
+            // Send the request
+            if (type === "group"){
+              // As color setting is not supported for groups, we need to get all devices that
+              // belongs to a group and set it individually and finally the state of the group
+              if (cinstruction.color){
+                node.hub.tradfri.getGroup(tradfri_id).then(group => {
+                  var calls = [];
+                  group.devices.forEach(device =>{
+                    calls.push(node.hub.tradfri.setDeviceState(device, cinstruction));
+                  });
+                  calls.push(node.hub.tradfri.setGroupState(tradfri_id, cinstruction));
+                  RSVP.all(calls).then(() => {msg.payload=true; if (node.output) node.send(msg);}).catch( err => {node.error(err); msg.payload=false; if (node.output) node.send(msg);});
+                });
+              } else {
+                node.hub.tradfri.setGroupState(tradfri_id, cinstruction).then(() => {msg.payload=true; if (node.output) node.send(msg);}).catch( err => {node.error(err); msg.payload=false; if (node.output) node.send(msg);});
+              }
+
+            } else {
+              node.hub.tradfri.setDeviceState(tradfri_id, cinstruction).then(() => {msg.payload=true; if (node.output) node.send(msg);}).catch(err => {node.error(err); msg.payload=false; if (node.output) node.send(msg);});
+            }
+
           }
+
           break;
         case "string":
           var action = msg.payload.trim().toLowerCase();
+
+          if (parseInt(node.tradfri_id) === 0){
+            node.error("Set your node properties");
+            return;
+          }
 
           if (node.dtype === "group")
             node.hub.tradfri.setGroupState(node.tradfri_id,{state: action}).then(() => {msg.payload=true; if (node.output) node.send(msg);}).catch( err => {node.error(err); msg.payload=false; if (node.output) node.send(msg);});
