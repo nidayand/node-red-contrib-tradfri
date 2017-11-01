@@ -247,6 +247,7 @@ module.exports = function(RED) {
     RED.nodes.createNode(this, config);
     this.name = config.name;
     this.hubip = config.hubip;
+    this.username = config.username;
     this.sid = config.sid;
     this.coap = config.coap;
     this.tradfri = null; // Declare object to hold Tradfri class

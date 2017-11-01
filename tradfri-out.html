@@ -139,7 +139,7 @@
                 var c = RED.nodes.node($('#node-input-hub option:selected').val());
 
                 // Try to connect to hub to get device and group data
-                $.get('/tradfri/controls', { sid: c.sid, coap: c.coap, hubip: c.hubip }, function (data) {
+                $.get('/tradfri/controls', { username: c.username, sid: c.sid, coap: c.coap, hubip: c.hubip }, function (data) {
 
                     // Stop spinner
                     $('#tradfri-spinner').removeClass('fa-pulse');
