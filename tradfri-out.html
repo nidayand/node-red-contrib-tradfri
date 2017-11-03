@@ -2,24 +2,24 @@
     RED.nodes.registerType('tradfri-get', {
         category: 'function',
         defaults: {
-            name: {value: ""},
-            hub : {type: "tradfri-config", required: true}
+            name: { value: "" },
+            hub: { type: "tradfri-config", required: true }
         },
         color: "#E9967A",
         icon: "light.png",
         align: 'left',
         inputs: 1,
         outputs: 1,
-        label : function(){ return this.name || "tradfri get"},
-        oneditprepare : function(){
-          var setHover = function(obj, txt){
-            obj.hover(function(){
-              $('#tradfri-help').html(txt);
-            },function(){
-              $('#tradfri-help').html('');
-            });
-          }
-          setHover($('#node-input-hub'),'Select IKEA hub configuration to use');
+        label: function () { return this.name || "tradfri get" },
+        oneditprepare: function () {
+            var setHover = function (obj, txt) {
+                obj.hover(function () {
+                    $('#tradfri-help').html(txt);
+                }, function () {
+                    $('#tradfri-help').html('');
+                });
+            }
+            setHover($('#node-input-hub'), 'Select IKEA hub configuration to use');
         }
     });
 </script>
@@ -70,105 +70,105 @@
     RED.nodes.registerType('tradfri-out', {
         category: 'output',
         defaults: {
-            name: {value: ""},
-            dtype: {value: "device"},
-            tradfri_id: {value: "0", required:true},
-            hub : {type: "tradfri-config", required: true},
-            output: {value: false, required:true }
+            name: { value: "" },
+            dtype: { value: "device" },
+            tradfri_id: { value: "0", required: true },
+            hub: { type: "tradfri-config", required: true },
+            output: { value: false, required: true }
         },
         color: "#E9967A",
         icon: "light.png",
         align: 'right',
         inputs: 1,
         outputs: 0,
-        label : function(){ return this.name || "tradfri"},
-        oneditsave: function(){
-          $('#node-input-name').val($('#node-input-tradfri_id option:selected').text());
-          $('#node-input-dtype').val($('#node-input-tradfri_id option:selected').attr('dtype'));
-          var node=this;
-          if ($("#node-input-output").is(":checked")){
-              node.outputs=1;
-          } else {
-              node.outputs=0;
-          }
-        },
-        oneditprepare: function(){
-          //Register help
-          var setHover = function(obj, txt){
-            obj.hover(function(){
-              $('#tradfri-help').html(txt);
-            },function(){
-              $('#tradfri-help').html('');
-            });
-          }
-          setHover($('#tradfri-custom-refresh'),'Click to refresh list of groups and devices from the IKEA hub');
-          setHover($('#node-input-hub'),'Select IKEA hub configuration to use');
-          setHover($('#node-input-tradfri_id'),'Select the light to control or choose [By msg.tradfri_id] to define the light to control via the inbound message');
-          setHover($('#node-input-output'),'Enable output to get the result from the request in msg.payload in boolean');
-
-          // Show name and id in select box
-          if (parseInt(this.tradfri_id) !== 0){
-            $('#node-input-tradfri_id').append($('<option>', {
-                        value: this.tradfri_id,
-                        text : this.name,
-                        dtype : this.dtype
-                    }));
-          }
-          //Select the saved value
-          $('#node-input-tradfri_id').val(this.tradfri_id);
-
-          // Register onchange to clear the list if config is changed
-          $('#node-input-config').on('change',function(){
-            $('#node-input-tradfri_id').find('option').remove();
-            $('#node-input-tradfri_id').append('<option value="0">By msg.tradfri_id</option>');
-          });
-
-          // Register onclick to get data
-          $('#tradfri-custom-refresh').click(function(){
-
-            // Get the selected configuration
-            if ($('#node-input-hub option:selected').val() === "_ADD_"){
-              alert("Please select a hub configuration");
-              return;
+        label: function () { return this.name || "tradfri" },
+        oneditsave: function () {
+            $('#node-input-name').val($('#node-input-tradfri_id option:selected').text());
+            $('#node-input-dtype').val($('#node-input-tradfri_id option:selected').attr('dtype'));
+            var node = this;
+            if ($("#node-input-output").is(":checked")) {
+                node.outputs = 1;
+            } else {
+                node.outputs = 0;
             }
+        },
+        oneditprepare: function () {
+            //Register help
+            var setHover = function (obj, txt) {
+                obj.hover(function () {
+                    $('#tradfri-help').html(txt);
+                }, function () {
+                    $('#tradfri-help').html('');
+                });
+            }
+            setHover($('#tradfri-custom-refresh'), 'Click to refresh list of groups and devices from the IKEA hub');
+            setHover($('#node-input-hub'), 'Select IKEA hub configuration to use');
+            setHover($('#node-input-tradfri_id'), 'Select the light to control or choose [By msg.tradfri_id] to define the light to control via the inbound message');
+            setHover($('#node-input-output'), 'Enable output to get the result from the request in msg.payload in boolean');
 
-            //Start spinner
-            $('#tradfri-spinner').addClass('fa-pulse');
+            // Show name and id in select box
+            if (parseInt(this.tradfri_id) !== 0) {
+                $('#node-input-tradfri_id').append($('<option>', {
+                    value: this.tradfri_id,
+                    text: this.name,
+                    dtype: this.dtype
+                }));
+            }
+            //Select the saved value
+            $('#node-input-tradfri_id').val(this.tradfri_id);
 
-            // Get the config node
-            var c = RED.nodes.node($('#node-input-hub option:selected').val());
-
-            // Try to connect to hub to get device and group data
-            $.get('/tradfri/controls',{sid:c.sid, coap:c.coap, hubip:c.hubip}, function(data){
-
-              // Stop spinner
-              $('#tradfri-spinner').removeClass('fa-pulse');
-
-              if (data.status === "ok"){
-                //Store the currently selected id and name
-                var tradfri_id = $('#node-input-tradfri_id option:selected').val();
-                var name = $('#node-input-tradfri_id option:selected').text();
-
-                // Remove old options
+            // Register onchange to clear the list if config is changed
+            $('#node-input-config').on('change', function () {
                 $('#node-input-tradfri_id').find('option').remove();
                 $('#node-input-tradfri_id').append('<option value="0">By msg.tradfri_id</option>');
-                data.items.forEach(function(item){
-                   $('#node-input-tradfri_id').append($('<option>', {
-                        value: item.id,
-                        text : item.name + (item.type==='group'? ' (group)':''),
-                        dtype: item.type
-                    }));
-                });
-                $('#node-input-tradfri_id').val(tradfri_id);
-
-                //Indicate update
-                $("#node-input-tradfri_id").fadeIn(100).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100);
-
-              } else {
-                alert('Please verify your hub configuration settings or try again!');
-              }
             });
-          });
+
+            // Register onclick to get data
+            $('#tradfri-custom-refresh').click(function () {
+
+                // Get the selected configuration
+                if ($('#node-input-hub option:selected').val() === "_ADD_") {
+                    alert("Please select a hub configuration");
+                    return;
+                }
+
+                //Start spinner
+                $('#tradfri-spinner').addClass('fa-pulse');
+
+                // Get the config node
+                var c = RED.nodes.node($('#node-input-hub option:selected').val());
+
+                // Try to connect to hub to get device and group data
+                $.get('/tradfri/controls', { username: c.username, sid: c.sid, coap: c.coap, hubip: c.hubip }, function (data) {
+
+                    // Stop spinner
+                    $('#tradfri-spinner').removeClass('fa-pulse');
+
+                    if (data.status === "ok") {
+                        //Store the currently selected id and name
+                        var tradfri_id = $('#node-input-tradfri_id option:selected').val();
+                        var name = $('#node-input-tradfri_id option:selected').text();
+
+                        // Remove old options
+                        $('#node-input-tradfri_id').find('option').remove();
+                        $('#node-input-tradfri_id').append('<option value="0">By msg.tradfri_id</option>');
+                        data.items.forEach(function (item) {
+                            $('#node-input-tradfri_id').append($('<option>', {
+                                value: item.id,
+                                text: item.name + (item.type === 'group' ? ' (group)' : ''),
+                                dtype: item.type
+                            }));
+                        });
+                        $('#node-input-tradfri_id').val(tradfri_id);
+
+                        //Indicate update
+                        $("#node-input-tradfri_id").fadeIn(100).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100);
+
+                    } else {
+                        alert('Please verify your hub configuration settings or try again!');
+                    }
+                });
+            });
         }
     });
 </script>
@@ -244,36 +244,57 @@
     RED.nodes.registerType('tradfri-config', {
         category: 'config',
         defaults: {
-            name:  {value: ""},
-            hubip : {value: "", required:true},
-            sid: {value:"", required:true},
-            coap: {value:"", required:true}
+            name: { value: "" },
+            hubip: { value: "", required: true },
+            username: { value: "", required: true },
+            sid: { value: "", required: true },
+            coap: { value: "", required: true }
         },
         label: function () {
             return this.name || "IKEA Hub";
         },
-        oneditprepare : function(){
-          var setHover = function(obj, txt){
-            obj.hover(function(){
-              $('#tradfri-help').html(txt);
-            },function(){
-              $('#tradfri-help').html('');
-            });
-          }
-          setHover($('#node-config-input-hubip'),'The IP address of the IKEA TRÅDFRI hub');
-          setHover($('#node-config-input-sid'),'The Security code as found on a sticker under the IKEA TRÅDFRI hub');
-          setHover($('#node-config-input-coap'),'A C program, libcoap, is used to talk to the IKEA TRÅDFRI hub and the path to program should be specified here. In the node-tradfri-argon node module are compilations included that could be used here (in the lib folder e.g. named coap-client-raspbian). If not visit <a href="https://github.com/nidayand/node-tradfri-argon" target=_blank>node-tradfri-argon</a> Github repo to get instructions on how to compile the library (for OSX and Linux)');
+        oneditprepare: function () {
+            var setHover = function (obj, txt) {
+                obj.hover(function () {
+                    $('#tradfri-help').html(txt);
+                }, function () {
+                    $('#tradfri-help').html('');
+                });
+            }
+            setHover($('#node-config-input-hubip'), 'The IP address of the IKEA TRÅDFRI hub');
+            setHover($('#node-config-input-username'), 'The username as choosen');
+            setHover($('#node-config-input-sid'), 'The Security code as generated');
+            setHover($('#node-config-input-coap'), 'A C program, libcoap, is used to talk to the IKEA TRÅDFRI hub and the path to program should be specified here. In the node-tradfri-argon node module are compilations included that could be used here (in the lib folder e.g. named coap-client-raspbian). If not visit <a href="https://github.com/nidayand/node-tradfri-argon" target=_blank>node-tradfri-argon</a> Github repo to get instructions on how to compile the library (for OSX and Linux)');
 
-          $.get('/tradfri/libs', function(data){
-            data.forEach(function(item){
-              var t = $("<a href='#'>"+item.file+"</a>");
-              t.on('click', function(){
-                $("#node-config-input-coap").val(item.path);
-              });
-              $("#tradfri-libs-prebuilt").append(t).append(" ");
+            $.get('/tradfri/libs', function (data) {
+                data.forEach(function (item) {
+                    var t = $("<a href='#'>" + item.file + "</a>");
+                    t.on('click', function () {
+                        $("#node-config-input-coap").val(item.path);
+                    });
+                    $("#tradfri-libs-prebuilt").append(t).append(" ");
+                });
+                $("#tradfri-libs-prebuilt").append(" or build yourself. See libcoap compilation instructions at <a href='https://github.com/nidayand/node-tradfri-argon' target=_blank>node-tradfri-argon</a>");
             });
-            $("#tradfri-libs-prebuilt").append(" or build yourself. See libcoap compilation instructions at <a href='https://github.com/nidayand/node-tradfri-argon' target=_blank>node-tradfri-argon</a>");
-          });
+            $('#node-config-onetime-submit').click(function () {
+                var ikeaip = $("#node-config-onetime-hubip").val();
+                var psk = $("#node-config-onetime-sid").val();
+                var username = $("#node-config-onetime-username").val();
+                var coap = $("#node-config-onetime-coap").val();
+                $.get('/tradfri/generateIdentity', { username: username, sid: psk, coap: coap, hubip: ikeaip }, function (data) {
+                    if (!data.status) {
+                        //Store the currently selected id and name
+                        $("#node-config-input-hubip").val(ikeaip);
+                        $("#node-config-input-username").val(username);
+                        $("#node-config-input-sid").val(data.securityId);
+                        $("#node-config-input-coap").val(coap);
+
+                    } else {
+                        alert('Please verify your hub configuration settings or try again!');
+                    }
+                });
+
+            });
         }
     });
 </script>
@@ -290,8 +311,12 @@
         <input type="text" id="node-config-input-hubip" placeholder="Hub IP address">
     </div>
     <div class="form-row">
-        <label for="node-config-input-sid"><i class="fa fa-tag"></i> Security Code</label>
-        <input type="text" id="node-config-input-sid" placeholder="As found on IKEA hub device">
+        <label for="node-config-input-username"><i class="fa fa-tag"></i> Username</label>
+        <input type="text" id="node-config-input-username" placeholder="Username as choosen">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-sid"><i class="fa fa-tag"></i> User PSK Code</label>
+        <input type="text" id="node-config-input-sid" placeholder="Generated PSK">
     </div>
     <div class="form-row">
         <label for="node-config-input-coap"><i class="fa fa-tag"></i> CoAP path</label>
@@ -303,4 +328,27 @@
     <div class="form-row">
         <i style="font-size:95%;color:#E9967A"><span id="tradfri-help"></span></i>
     </div>
+    <div class="form-row">
+        <h3>Generate new User-Identity</h3>
+    </div>
+    <div class="form-row">
+        <label for="node-config-onetime-hubip"><i class="fa fa-tag"></i> Hub IP address</label>
+        <input class="onetime-generation" type="text" id="node-config-onetime-hubip" placeholder="Hub IP address">
+    </div>
+    <div class="form-row">
+        <label for="node-config-onetime-sid"><i class="fa fa-tag"></i>Tradfri PSK Code</label>
+        <input class="onetime-generation" type="text" id="node-config-onetime-sid" placeholder="As found on IKEA hub device">
+    </div>
+    <div class="form-row">
+        <label for="node-config-onetime-username"><i class="fa fa-tag"></i>Choose a username</label>
+        <input class="onetime-generation" type="text" id="node-config-onetime-username" placeholder="Choose a username">
+    </div>
+    <div class="form-row">
+        <label for="node-config-onetime-coap"><i class="fa fa-tag"></i> CoAP path</label>
+        <input class="onetime-generation" type="text" id="node-config-onetime-coap" placeholder="CoAP path">
+    </div>
+    <div class="form-row">
+        <button id="node-config-onetime-submit">Generate User-Identity</button>
+    </div>
+
 </script>
