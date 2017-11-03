@@ -299,7 +299,44 @@ module.exports = function(RED) {
         res.end();
       })
       .catch(err => {
-        console.log(22);
+        console.log(err);
+        retError(err, res);
+      });
+  });
+
+  RED.httpAdmin.get("/tradfri/generateIdentity", function(req, res) {
+    /* Expecting to get the following params
+      sid, hubip, coap
+    */
+
+    var tradfri = require("node-tradfri-argon").create({
+      securityId: req.query.sid,
+      username: "Client_identity",
+      hubIpAddress: req.query.hubip,
+      coapClientPath: req.query.coap
+    });
+
+    var d = [];
+    var retError = function(err, res) {
+      res.writeHead(200, {
+        "Content-Type": "application/json"
+      });
+      res.write(JSON.stringify({ status: "error" }));
+      res.end();
+    };
+
+    tradfri
+      .generateIdentity(req.query.username)
+      .then(psk => {
+        // Return
+        res.writeHead(200, {
+          "Content-Type": "application/json"
+        });
+        res.write(JSON.stringify(psk));
+        res.end();
+      })
+      .catch(err => {
+        console.log(err);
         retError(err, res);
       });
   });

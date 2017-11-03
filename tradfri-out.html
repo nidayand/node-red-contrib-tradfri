@@ -276,6 +276,25 @@
                 });
                 $("#tradfri-libs-prebuilt").append(" or build yourself. See libcoap compilation instructions at <a href='https://github.com/nidayand/node-tradfri-argon' target=_blank>node-tradfri-argon</a>");
             });
+            $('#node-config-onetime-submit').click(function () {
+                var ikeaip = $("#node-config-onetime-hubip").val();
+                var psk = $("#node-config-onetime-sid").val();
+                var username = $("#node-config-onetime-username").val();
+                var coap = $("#node-config-onetime-coap").val();
+                $.get('/tradfri/generateIdentity', { username: username, sid: psk, coap: coap, hubip: ikeaip }, function (data) {
+                    if (!data.status) {
+                        //Store the currently selected id and name
+                        $("#node-config-input-hubip").val(ikeaip);
+                        $("#node-config-input-username").val(username);
+                        $("#node-config-input-sid").val(data.securityId);
+                        $("#node-config-input-coap").val(coap);
+
+                    } else {
+                        alert('Please verify your hub configuration settings or try again!');
+                    }
+                });
+
+            });
         }
     });
 </script>
@@ -296,8 +315,8 @@
         <input type="text" id="node-config-input-username" placeholder="Username as choosen">
     </div>
     <div class="form-row">
-        <label for="node-config-input-sid"><i class="fa fa-tag"></i> Security Code</label>
-        <input type="text" id="node-config-input-sid" placeholder="As found on IKEA hub device">
+        <label for="node-config-input-sid"><i class="fa fa-tag"></i> User PSK Code</label>
+        <input type="text" id="node-config-input-sid" placeholder="Generated PSK">
     </div>
     <div class="form-row">
         <label for="node-config-input-coap"><i class="fa fa-tag"></i> CoAP path</label>
@@ -309,4 +328,27 @@
     <div class="form-row">
         <i style="font-size:95%;color:#E9967A"><span id="tradfri-help"></span></i>
     </div>
+    <div class="form-row">
+        <h3>Generate new User-Identity</h3>
+    </div>
+    <div class="form-row">
+        <label for="node-config-onetime-hubip"><i class="fa fa-tag"></i> Hub IP address</label>
+        <input class="onetime-generation" type="text" id="node-config-onetime-hubip" placeholder="Hub IP address">
+    </div>
+    <div class="form-row">
+        <label for="node-config-onetime-sid"><i class="fa fa-tag"></i>Tradfri PSK Code</label>
+        <input class="onetime-generation" type="text" id="node-config-onetime-sid" placeholder="As found on IKEA hub device">
+    </div>
+    <div class="form-row">
+        <label for="node-config-onetime-username"><i class="fa fa-tag"></i>Choose a username</label>
+        <input class="onetime-generation" type="text" id="node-config-onetime-username" placeholder="Choose a username">
+    </div>
+    <div class="form-row">
+        <label for="node-config-onetime-coap"><i class="fa fa-tag"></i> CoAP path</label>
+        <input class="onetime-generation" type="text" id="node-config-onetime-coap" placeholder="CoAP path">
+    </div>
+    <div class="form-row">
+        <button id="node-config-onetime-submit">Generate User-Identity</button>
+    </div>
+
 </script>
