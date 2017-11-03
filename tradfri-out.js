@@ -14,7 +14,9 @@ module.exports = function (RED) {
       node.hub.tradfri = require('node-tradfri-argon').create({
         securityId: node.hub.sid,
         hubIpAddress: node.hub.hubip,
-        coapClientPath: node.hub.coap
+        coapClientPath: node.hub.coap,
+        identity: node.hub.identity,
+        preshared_key: node.hub.preshared_key
       });
     }
 
@@ -68,7 +70,9 @@ module.exports = function (RED) {
       node.hub.tradfri = require('node-tradfri-argon').create({
         securityId: node.hub.sid,
         hubIpAddress: node.hub.hubip,
-        coapClientPath: node.hub.coap
+        coapClientPath: node.hub.coap,
+        identity: node.hub.identity,
+        preshared_key: node.hub.preshared_key
       });
     }
 
@@ -150,6 +154,8 @@ module.exports = function (RED) {
     this.hubip = config.hubip;
     this.sid = config.sid;
     this.coap = config.coap;
+    this.identity = config.identity;
+    this.preshared_key = config.preshared_key;
     this.tradfri = null; // Declare object to hold Tradfri class
 
   }
@@ -163,7 +169,9 @@ module.exports = function (RED) {
     var tradfri = require('node-tradfri-argon').create({
       securityId: req.query.sid,
       hubIpAddress: req.query.hubip,
-      coapClientPath: req.query.coap
+      coapClientPath: req.query.coap,
+      identity: req.query.identity,
+      preshared_key: req.query.preshared_key
     });
 
     var d = [];
@@ -200,6 +208,30 @@ module.exports = function (RED) {
       console.log(22);
       retError(err, res);
     });
+  });
+
+  RED.httpAdmin.get('/tradfri/register', function(req, res){
+    var tradfri = require('node-tradfri-argon').create({
+      securityId: req.query.sid,
+      hubIpAddress: req.query.hubip,
+      coapClientPath: req.query.coap,
+      identity: req.query.identity
+    });
+    var retError = function(err, res){
+      res.writeHead(200, {
+        'Content-Type': 'application/json'
+      });
+      res.write(JSON.stringify({ status: 'error'}));
+      res.end();
+    }
+
+    tradfri.register().then(resp => {
+      res.writeHead(200, {
+        'Content-Type': 'application/json'
+      });
+      res.write(JSON.stringify({ preshared_key: resp.preshared_key, status: 'ok'}));
+      res.end();
+    }).catch( err => {retError(err, res);});
   });
 
   RED.httpAdmin.get('/tradfri/libs', function (req, res) {

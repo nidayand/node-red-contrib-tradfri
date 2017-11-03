@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/nidayand/node-red-contrib-tradfri#readme",
   "dependencies": {
-    "node-tradfri-argon": "^1.0.12",
+    "node-tradfri-argon": "^1.1.1",
     "rsvp": "^3.5.0"
   },
   "devDependencies": {
