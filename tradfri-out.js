@@ -104,6 +104,7 @@ module.exports = function (RED) {
             cinstruction.state = msg.payload.state ? msg.payload.state: undefined;
             cinstruction.brightness = msg.payload.brightness ? msg.payload.brightness : undefined;
             cinstruction.color = msg.payload.color ? msg.payload.color : undefined;
+            cinstruction.mired = msg.payload.mired ? msg.payload.mired : undefined;
             cinstruction.transitionTime = msg.payload.transitiontime ? msg.payload.transitiontime*10 : undefined; //Convert to expected lib input (*10)
 
             // Send the request
