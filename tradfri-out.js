@@ -1,6 +1,7 @@
 module.exports = function (RED) {
   'use strict';
   var RSVP = require('rsvp');
+  var ShortUniqueId = require('short-unique-id');
 
   function TradfriUtilNode(config) {
     RED.nodes.createNode(this, config);
@@ -217,11 +218,14 @@ module.exports = function (RED) {
   });
 
   RED.httpAdmin.get('/tradfri/register', function(req, res){
+    //Generate UUID
+    var uid = new ShortUniqueId().randomUUID(13);
+
     var tradfri = require('node-tradfri-argon').create({
       securityId: req.query.sid,
       hubIpAddress: req.query.hubip,
       coapClientPath: req.query.coap,
-      identity: req.query.identity
+      identity: uid
     });
     var retError = function(err, res){
       res.writeHead(200, {
@@ -235,7 +239,7 @@ module.exports = function (RED) {
       res.writeHead(200, {
         'Content-Type': 'application/json'
       });
-      res.write(JSON.stringify({ preshared_key: resp.preshared_key, status: 'ok'}));
+      res.write(JSON.stringify({ identity: uid, preshared_key: resp.preshared_key, status: 'ok'}));
       res.end();
     }).catch( err => {retError(err, res);});
   });

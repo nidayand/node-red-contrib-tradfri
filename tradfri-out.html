@@ -266,18 +266,6 @@
           setHover($('#node-config-input-identity'),'A string that identifies the app. Once entered a registration can only happen once and the preshared key returned by the hub must be saved for future reference');
           setHover($('#node-config-input-preshared_key'),'After a registration is made on a new App Identity the value needs to be stored here. If not empty the Register button will be disabled');
 
-          $('#node-config-input-preshared_key').on("change", function(){
-            if ($('#node-config-input-preshared_key').val().trim().length>0){
-              $('#node-config-button').prop( "disabled", true );
-            } else {
-              $('#node-config-button').prop( "disabled", false );
-            }
-          });
-
-          if ($('#node-config-input-preshared_key').val().trim().length>0){
-            $('#node-config-button').prop( "disabled", true );
-          }
-
           $('#node-config-button').on("click", function(){
             var tsid = $('#node-config-input-sid').val(),
                 tcoap = $('#node-config-input-coap').val(),
@@ -288,11 +276,12 @@
               return val.trim().length>0;
             };
 
-            if (vtst(tsid) && vtst(tcoap) && vtst(thubip) && vtst(tidentity)){
-              $.get('/tradfri/register',{sid: tsid, coap:tcoap, hubip:thubip, identity:tidentity}, function(data){
+            if (vtst(tsid) && vtst(tcoap) && vtst(thubip)){
+              $.get('/tradfri/register',{sid: tsid, coap:tcoap, hubip:thubip}, function(data){
                 if (data.status == 'ok'){
                   $('#node-config-input-preshared_key').val(data.preshared_key);
-                  $('#node-config-button').prop( "disabled", false );
+                  $('#node-config-input-identity').val(data.identity);
+
                   alert("New preshared key was received and the field has been updated")
                 } else {
                   alert("Registration did not work. Verify your settings and possibly try another identity. Note that an identity can only be used once and the response preshared key must be stored for usage with the identity");
@@ -341,11 +330,11 @@
         </div>
     </div>
     <div class="form-row">
-        <label for="node-config-input-identity"><i class="fa fa-tag"></i> App Identity</label>
-        <input type="text" id="node-config-input-identity" placeholder="Custom value that is identifying the connection">
+         <button type="button" id="node-config-button">Get Preshared key on App Identity</button>
     </div>
     <div class="form-row">
-         <button type="button" id="node-config-button">Get Preshared key on App Identity</button>
+        <label for="node-config-input-identity"><i class="fa fa-tag"></i> App Identity</label>
+        <input type="text" id="node-config-input-identity" placeholder="Custom value that is identifying the connection">
     </div>
     <div class="form-row">
         <label for="node-config-input-preshared_key"><i class="fa fa-tag"></i> Preshared key</label>

@@ -20,7 +20,8 @@
   "homepage": "https://github.com/nidayand/node-red-contrib-tradfri#readme",
   "dependencies": {
     "node-tradfri-argon": "^1.1.1",
-    "rsvp": "^3.5.0"
+    "rsvp": "^3.5.0",
+    "short-unique-id": "^1.1.1"
   },
   "devDependencies": {
     "eslint": "3.19.0",
