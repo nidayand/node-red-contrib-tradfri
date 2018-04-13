@@ -88,22 +88,28 @@ module.exports = function (RED) {
             return;
           }
 
-          if (msg.payload.instruction){
-            // DEPRECATED v1.0.5 Will remote instruction object in v1.1.0
-            // TODO: Remove in v1.1.0
-            // Too complicated structure
-            if (type === "group"){
-              node.hub.tradfri.setGroupState(tradfri_id, msg.payload.instruction).then(() => {msg.payload=true; if (node.output) node.send(msg);}).catch( err => {node.error(err); msg.payload=false; if (node.output) node.send(msg);});
-            } else {
-              node.hub.tradfri.setDeviceState(tradfri_id, msg.payload.instruction).then(() => {msg.payload=true; if (node.output) node.send(msg);}).catch(err => {node.error(err); msg.payload=false; if (node.output) node.send(msg);});
-            }
-          } else {
             // Create object
             var cinstruction = {};
 
             cinstruction.state = msg.payload.state ? msg.payload.state: undefined;
-            cinstruction.brightness = msg.payload.brightness ? msg.payload.brightness : undefined;
+
+            //Set brightness = 0 if turnoff state
+            if (msg.payload.state && msg.payload.state.toLowerCase() == "off"){
+              cinstruction.brightness = 0;
+            } else {
+              cinstruction.brightness = msg.payload.brightness ? msg.payload.brightness  : undefined;
+            }
+
+            //Turn off if brightness = 0
+            if (msg.payload.brightness && msg.payload.brightness == 0){
+              cinstruction.state = "off";
+            }
             cinstruction.color = msg.payload.color ? msg.payload.color : undefined;
+
+            //Remove # if included
+            if (cinstruction.color){
+              cinstruction.color = cinstruction.color.replace('#', '').toLowerCase();
+            }
             cinstruction.transitionTime = msg.payload.transitiontime ? msg.payload.transitiontime*10 : undefined; //Convert to expected lib input (*10)
 
             // Send the request
@@ -127,7 +133,6 @@ module.exports = function (RED) {
               node.hub.tradfri.setDeviceState(tradfri_id, cinstruction).then(() => {msg.payload=true; if (node.output) node.send(msg);}).catch(err => {node.error(err); msg.payload=false; if (node.output) node.send(msg);});
             }
 
-          }
 
           break;
         case "string":

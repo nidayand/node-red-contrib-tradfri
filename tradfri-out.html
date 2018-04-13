@@ -221,14 +221,11 @@
      - <code>tradfri_id</code> (Integer) - optional - Not needed if target has been specified in the node <br>
      - <code>type</code> (String) - optional - [‘group’, ‘device’] - specifies if the call is for a group or device. Not needed if target has been specified in the node <br>
      - <code>state</code> (String) - [‘on’, ‘off’, ‘toggle’] - specifies the state instruction <br>
-     - <code>brightness</code> (Integer) - [0-255] - specifies the brightness of the instruction <br>
+     - <code>brightness</code> (Integer) - [0-254] - specifies the brightness of the instruction <br>
      - <code>color</code> (String) - [hex color value, ‘cool’, ‘normal’, ‘warm’] - color code (HEX - e.g. ‘ffffff’ or cool/normal/warm)<br>
      - <code>transitiontime</code> (Integer) - time in seconds to transition from one state to another</p>
 
     <p><strong>Examples:</strong> <code>msg.payload = 'on';</code> or <code>msg.payload = { tradfri_id: 1234, type:'device', state: 'on', color: 'cool'}</code></p>
-
-    <p><strong>DEPRECATED</strong>: msg.payload.instruction variable is deprecated from v1.0.5 <br>
-    <del><code>{ tradfri_id: 12321, type: "group", instruction: { state: "on", brightness: 255}}</code> where <code>tradfri_id</code>, <code>type</code> ('device' or 'group') and <code>brightness</code> are optional parameters (depending on the node configuration)</del></p>
 
     <p>The <code>Config</code> setting requires a number of parameters:</p>
     <ul>
