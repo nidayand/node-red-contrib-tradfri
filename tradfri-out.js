@@ -110,6 +110,7 @@ module.exports = function (RED) {
             if (cinstruction.color){
               cinstruction.color = cinstruction.color.replace('#', '').toLowerCase();
             }
+            cinstruction.mired = msg.payload.mired ? msg.payload.mired : undefined;
             cinstruction.transitionTime = msg.payload.transitiontime ? msg.payload.transitiontime*10 : undefined; //Convert to expected lib input (*10)
 
             // Send the request
