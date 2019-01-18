@@ -139,7 +139,7 @@
             var c = RED.nodes.node($('#node-input-hub option:selected').val());
 
             // Try to connect to hub to get device and group data
-            $.get('/tradfri/controls',{sid:c.sid, coap:c.coap, hubip:c.hubip, identity:c.identity, preshared_key:c.preshared_key}, function(data){
+            $.get('tradfri/controls',{sid:c.sid, coap:c.coap, hubip:c.hubip, identity:c.identity, preshared_key:c.preshared_key}, function(data){
 
               // Stop spinner
               $('#tradfri-spinner').removeClass('fa-pulse');
@@ -277,7 +277,7 @@
             };
 
             if (vtst(tsid) && vtst(tcoap) && vtst(thubip)){
-              $.get('/tradfri/register',{sid: tsid, coap:tcoap, hubip:thubip}, function(data){
+              $.get('tradfri/register',{sid: tsid, coap:tcoap, hubip:thubip}, function(data){
                 if (data.status == 'ok'){
                   $('#node-config-input-preshared_key').val(data.preshared_key);
                   $('#node-config-input-identity').val(data.identity);
@@ -293,7 +293,7 @@
 
           });
 
-          $.get('/tradfri/libs', function(data){
+          $.get('tradfri/libs', function(data){
             data.forEach(function(item){
               var t = $("<a href='#'>"+item.file+"</a>");
               t.on('click', function(){
