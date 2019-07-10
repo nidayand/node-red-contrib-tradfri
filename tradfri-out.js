@@ -3,6 +3,8 @@ module.exports = function (RED) {
   var RSVP = require('rsvp');
   var ShortUniqueId = require('short-unique-id');
 
+  var MAX_BRIGHTNESS = 254;
+
   function TradfriUtilNode(config) {
     RED.nodes.createNode(this, config);
     this.hub = RED.nodes.getNode(config.hub);
@@ -98,7 +100,7 @@ module.exports = function (RED) {
             if (msg.payload.state && msg.payload.state.toLowerCase() == "off"){
               cinstruction.brightness = 0;
             } else {
-              cinstruction.brightness = msg.payload.brightness ? msg.payload.brightness  : undefined;
+              cinstruction.brightness = msg.payload.brightness ? Math.min(msg.payload.brightness, MAX_BRIGHTNESS)  : undefined;
             }
 
             //Turn off if brightness = 0
